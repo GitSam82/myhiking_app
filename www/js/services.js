@@ -1,10 +1,11 @@
 angular.module('myhiking.services', [])
-.factory('MapService', function($http,$q) {
+.factory('MapService', function($http, $q, routeConfig) {
          
     var MapService = {
-        async: function() {
+        asyncAll: function() {
           // $http returns a promise, which has a then function, which also returns a promise
-           var url = "http://192.168.1.100:3001/map/all";
+            alert(routeConfig.url);
+            var url = routeConfig.url+"map/all";
             var promise = $http.get(url).then(function (response) {
             // The then function here is an opportunity to modify the response
             console.log(response);
@@ -14,7 +15,17 @@ angular.module('myhiking.services', [])
     
       // Return the promise to the controller
       return promise;
-    }
+    },
+        asyncInit: function(mapId){
+            var firstCall = $http.get(routeConfig.url+"map/"+mapId+"/base");
+            var secondCall = $http.get(routeConfig.url+"map/"+mapId+"/decorations");
+            
+            var promise = $q.all([firstCall, secondCall]).then(function(values) {  
+                return values;
+            });
+           
+            return promise;
+        }
   };
   return MapService;
 });

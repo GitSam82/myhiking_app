@@ -3,19 +3,19 @@ angular.module('myhiking.controllers', [])
     .controller('MapIndexCtrl', function($scope,MapService) {
         $scope.searchKey = "";
     
-        MapService.async().then(function(d) {
+        MapService.asyncAll().then(function(d) {
             $scope.maps = d;
         });
     })
 
-    .controller('MapDetailCtrl', function ($scope, $stateParams, $http, routeConfig) {
+    .controller('MapDetailCtrl', function ($scope, $stateParams, $http, routeConfig,MapService) {
         var url1 = routeConfig.url+"map/"+$stateParams.mapId+"/base";
         var url2 = routeConfig.url+"map/"+$stateParams.mapId+"/decorations";
-    
         //Invoke the route for obtainig the resources for:
         //Map initialization
         //Map GeoJSON data
-          $http.get(url1).
+          
+    /*$http.get(url1).
             success(function(data, status, headers, config) {    
                 var initMapObj = data[0];    
               
@@ -28,7 +28,13 @@ angular.module('myhiking.controllers', [])
             }).
             error(function(data, status, headers, config) {
            
-            });
+            });*/
+    
+        MapService.asyncInit($stateParams.mapId).then(function(result) {
+            var jsonInit = result[0];
+            var jsonData = result[1];
+            startMap(jsonInit.data[0],jsonData.data[0]);
+        });
            
         $scope.scanQrcode = function(){
             capturePhoto(function(qrmessage){
