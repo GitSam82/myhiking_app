@@ -1,0 +1,31 @@
+
+<ion-view title="Dettaglio">
+  <ion-nav-buttons side="primary">
+        <button class="button" ng-click="scanQrcode()">
+            Scan
+        </button>
+    </ion-nav-buttons>
+   <!--<div data-tap-disabled="true" style="top:60px;width:100%;height:50%">-->
+
+    <ion-content id="map" data-tap-disabled="true" class="has-header has-footer">
+        
+    </ion-content>
+    
+    <!--<div id="map" data-tap-disabled="true" style="position:absolute;bottom:0px;width:100%;height:90%">
+      
+      
+      
+    </div>-->
+    <!--</div>-->
+    <!--<div id="status" class="bar bar-footer" ></div>-->
+    
+    <ion-footer-bar id="status" align-title="center" class="bar-balanced">
+        <div id="status_title" class="title"></div>
+          <div class="buttons" ng-click="cacheMap()">
+            <button class="button">Cache</button>
+          </div>
+</ion-footer-bar>
+   
+    
+    
+</ion-view>
