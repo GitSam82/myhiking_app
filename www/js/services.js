@@ -4,7 +4,6 @@ angular.module('myhiking.services', [])
     var MapService = {
         asyncAll: function() {
           // $http returns a promise, which has a then function, which also returns a promise
-            alert(routeConfig.url);
             var url = routeConfig.url+"map/all";
             var promise = $http.get(url).then(function (response) {
             // The then function here is an opportunity to modify the response
@@ -25,6 +24,24 @@ angular.module('myhiking.services', [])
             });
            
             return promise;
+        }, 
+        getCheckpointData: function(mapData){
+        var url = routeConfig.url+"map/"+mapData.mId+"/"+mapData.rId+"/"+mapData.cId+"/data";
+
+          var promise = $http.get(url).then(
+              function(values){
+                    return values.data[0];
+              }
+          );
+          return promise;
+        },
+        updateCheckpoint: function(mapData){
+          var promise = $http.post(routeConfig.url+'map/createCheckpoint', mapData).then(
+              function(values){
+                  return values;
+              }
+          );
+          return promise;
         }
   };
   return MapService;

@@ -47,13 +47,22 @@ angular.module('myhiking.controllers', [])
                 var url = routeConfig.url+"map/"+obj.mId+"/"+obj.rId+"/"+obj.cId+"/data";
                 var additionalData = undefined;
                 
-                $http.get(url).
+               /* $http.get(url).
                     success(function(data, status, headers, config) {    
                         additionalData = data[0];
                      addGeoJSONMarker(obj.lat,obj.lng,additionalData);
                 }).error(function(data, status, headers, config) {
-           
+
+                });*/
+                
+                MapService.getCheckpointData(obj).then(function(result){
+                    addGeoJSONMarker(obj.lat,obj.lng,result);
                 });
+                
+                MapService.updateCheckpoint({"mapId":obj.mId, "routeId" : obj.rId, "checkpointId": obj.cId, $inc: { accessNumber: 1 } }).then(function(result) {
+            
+                });
+                
             });
         }
         
@@ -74,9 +83,3 @@ angular.module('myhiking.controllers', [])
          }
     
     });
-
-    /*.controller('EmployeeReportsCtrl', function ($scope, $stateParams, EmployeeService) {
-        EmployeeService.findByManager($stateParams.employeeId).then(function(employees) {
-            $scope.employees = employees;
-        });
-    });*/
