@@ -29,16 +29,19 @@ function startMap(initObj, initGeoJSON) {
         MAP.fitBounds(bounds);
 
         L.mapbox.accessToken = ACCESS_TOKEN;
+
         BASE = L.mapbox.tileLayerCordova('https://api.tiles.mapbox.com/v4/' + MAP_ID + '/{z}/{x}/{y}.png?access_token=' + ACCESS_TOKEN, {
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+            'Imagery © <a href="http://mapbox.com">Mapbox</a>',
             folder: FOLDER_NAME,
             name: MAP_NAME,
             debug: true
         }, function () {
             updateStatus();
-        }).addTo(MAP);
+        });
+
+        BASE.addTo(MAP);
 
         //Add GeoJSON fearture.
         L.mapbox.featureLayer(initGeoJSON).addTo(MAP);
@@ -129,26 +132,25 @@ function addMarker(lat, lng, additionalJSONData) {
     var featureLayer = L.mapbox.featureLayer(checkpoint).addTo(MAP);
 
     var content = '<div >' +
-        '<h2>' + featureLayer.getGeoJSON().properties.title + '</h2>' +
+        '<h1>' + featureLayer.getGeoJSON().properties.title + '</h1>' +
         '<div>' +
-        '<h1>Descrizione</h1>' +
+        '<h3>Descrizione</h3>' +
         featureLayer.getGeoJSON().properties.description +
         '</div>' +
         '<div>' +
-        '<h1>Direzione</h1>' +
+        '<h3>Direzione</h3>' +
         featureLayer.getGeoJSON().properties.directions +
-        '<img src="' + featureLayer.getGeoJSON().properties.directionsImg + '" style="width:100%"/>' +
+        '<img src="' + featureLayer.getGeoJSON().properties.directionsImg + '" class="popup_img"/>' +
         '</div>'
     '</div>';
     featureLayer.bindPopup(content, {
         closeButton: true,
-        minWidth: 320
+        minWidth: 280
     });
 
 }
 
 function updateStatus() {
-    //    document.getElementById('status').innerHTML =  MAP.getCenter().lat.toFixed(5) + ' x ' + MAP.getCenter().lng.toFixed(5) + ' @ ' + MAP.getZoom() + (BASE.isOnline() ? ' (ONLINE)' : BASE.isOffline() ? ' (OFFLINE)' : '');
     var status_text = "";
     var cache_text = "";
 
@@ -196,14 +198,14 @@ function cachingBounds() {
 
     var message = "Inizio la procedura di caching dei tiles.\n" + "Zoom level " + zmin + " through " + zmax + "\n" + tile_list.length + " tiles totali.";
     var ok = navigator.notification.confirm(message,
-        function (buttonIndex) {
-            if (buttonIndex == 1) {
-                caching('bounds', tile_list);
-            } else {
-                return false;
-            }
-        },
-        "Info", ["OK", "Annulla"]);
+                                            function (buttonIndex) {
+        if (buttonIndex == 1) {
+            caching('bounds', tile_list);
+        } else {
+            return false;
+        }
+    },
+                                            "Info", ["OK", "Annulla"]);
 }
 
 function caching(which, tile_list) {

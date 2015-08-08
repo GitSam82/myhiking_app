@@ -12,20 +12,9 @@ function capturePhoto(callback) {
 }
 
 function onFail(message){
-    alert(message);
+     navigator.notification.alert("Errore durante la scansione:" + message + ". ", function () {}, "Error", "Chiudi");
 }
 
 function onPhotoDataSuccess(imageData) {
     qrcode.decode("data:image/jpeg;base64," + imageData);
-}
-
-function JSQrcodeCallback(qrInput)
-{
-	alert(qrInput);
-
-    
-}	
-        
-function JSQrcodeInit(){
-    qrcode.callback = JSQrcodeCallback;
 }

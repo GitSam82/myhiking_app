@@ -1,39 +1,17 @@
-<ion-view view-title="Mappe">
-    <!--<ion-content>
-<div class="bar bar-subheader bar-stable">
-<label class="item item-input">
-<i class="icon ion-ios7-search placeholder-icon"></i>
-<input id="searchKey" type="search" placeholder="Search" ng-model="searchKey" autocorrect="off" >
-<button class="button button-light" ng-click="clearSearch()">X</button>
-</label>
-<button class="button button-light" ng-click="search()">Search</button>
-</div>
-</ion-content>
-
-<ion-content>
-<ion-list>
-<ion-item ng-repeat="map in maps" href="#/map/{{map.key}}">
-<h3>{{map.description}}</h3>
-</ion-item>
-</ion-list>
-</ion-content>
-
-</ion-view>-->
-
-
-
-
-    <ion-content >
-        <div class="list">
-           <!-- <div class="bar bar-header item-input-inset">
-                <label class="item item-input">
-                    <i class="icon ion-ios7-search placeholder-icon"></i>
-                    <input id="searchKey" type="text" placeholder="Search" ng-model="searchKey" autocorrect="off" >
-                    <button class="button button-light" ng-click="clearSearch()">X</button>
-                </label>
-                
-            </div>-->
-            
+<ion-view view-title="My Hiking">
+    <script id="intro-popup.html" type="text/ng-template">
+            <div>Di seguito ti spiegheremo il funzionamento dell'applicazione!</div>
+            <br/>
+            <div>Prima di tutto seleziona una mappa dalla lista, poi potrai:</div>
+            <br/>
+            <div>1. Visualizzare la tua posizione sulla mappa.</div>
+            <div>2. Con il tasto <b>scan</b> potrai leggere i qrcode posti sul percorso per visualizzare.</div>
+            <div>3. Con il tasto <b>salva</b> potrai salvare in memoria la mappa in caso di assenza di segnale dati.</div>
+    </script>
+    
+    
+    <ion-content>
+        <div class="list"> 
             <div class="list list-inset item-input-inset">
               <label class="item-input-wrapper">
                 <i class="icon ion-ios-search placeholder-icon"></i>
@@ -43,8 +21,6 @@
                 Cancel
               </button>
             </div>
-            
-            
             <ion-list>
                 <ion-item ng-repeat="map in maps | filter:searchKey" href="#/map/{{map.mapId}}">
                     <h3>{{map.name}}</h3>

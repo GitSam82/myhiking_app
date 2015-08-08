@@ -1,85 +1,122 @@
 angular.module('myhiking.controllers', [])
 
-    .controller('MapIndexCtrl', function($scope,MapService) {
-        $scope.searchKey = "";
-    
-        MapService.asyncAll().then(function(d) {
-            $scope.maps = d;
-        });
-    })
+    .controller('MapIndexCtrl', function($scope,$ionicPopup,MapService) {
+    $scope.searchKey = "";
 
-    .controller('MapDetailCtrl', function ($scope, $stateParams, $http, routeConfig,MapService) {
-        var url1 = routeConfig.url+"map/"+$stateParams.mapId+"/base";
-        var url2 = routeConfig.url+"map/"+$stateParams.mapId+"/decorations";
-        //Invoke the route for obtainig the resources for:
-        //Map initialization
-        //Map GeoJSON data
-          
-    /*$http.get(url1).
-            success(function(data, status, headers, config) {    
-                var initMapObj = data[0];    
-              
-                $http.get(url2).
-                    success(function(data, status, headers, config) {    
-                        startMap(initMapObj,data[0]);
-                    }).error(function(data, status, headers, config) {
-           
-                    });
-            }).
-            error(function(data, status, headers, config) {
-           
-            });*/
-    
-        MapService.asyncInit($stateParams.mapId).then(function(result) {
-            var jsonInit = result[0];
-            var jsonData = result[1];
-            startMap(jsonInit.data[0],jsonData.data[0]);
-        });
-           
-        $scope.scanQrcode = function(){
-            capturePhoto(function(qrmessage){
-                //{mId: "samueleferrari.mpao2mk0",rId : "34",cId: "1",lat:"46.933553",lng:"11.367781"}
-               // var test = "{\"mId\": \"samueleferrari.mpao2mk0\",\"rId\" : \"34\",\"cId\": \"1\",\"lat\":\"46.933553\",\"lng\":\"11.367781\"}";
-              // alert(qrmessage);
-                    
-                var obj = JSON.parse(qrmessage.replace(/\\"/g, '"'));
-               
-                var url = routeConfig.url+"map/"+obj.mId+"/"+obj.rId+"/"+obj.cId+"/data";
-                var additionalData = undefined;
-                
-               /* $http.get(url).
-                    success(function(data, status, headers, config) {    
-                        additionalData = data[0];
-                     addGeoJSONMarker(obj.lat,obj.lng,additionalData);
-                }).error(function(data, status, headers, config) {
-
-                });*/
-                
-                MapService.getCheckpointData(obj).then(function(result){
-                    addGeoJSONMarker(obj.lat,obj.lng,result);
-                });
-                
-                MapService.updateCheckpoint({"mapId":obj.mId, "routeId" : obj.rId, "checkpointId": obj.cId, $inc: { accessNumber: 1 } }).then(function(result) {
-            
-                });
-                
-            });
-        }
-        
-         $scope.cacheMap = function(){
-             
-             navigator.notification.confirm(
-                 "Il download della mappa consumerà parte dei dati mobili disponibili.",
-                 function(buttonIndex){
-                     if(buttonIndex == 1){
-                           cachingBounds();
-                     }else{
-                         return false;
-                     }
-                 },
-                 "Info",
-                 ["OK","Annulla"]
-             );
-         }
-    
+    MapService.getAll().then(function(d) {
+        $scope.maps = d;
+    },function(err){
+        navigator.notification.alert("Errore di comunicazione con il server", function () {}, "Error", "Chiudi");
     });
+          
+    window.localStorage.removeItem("firstboot");
+    var firstBoot = window.localStorage.getItem("firstboot");
+
+    if(firstBoot == undefined){
+        
+        $ionicPopup.show({
+    templateUrl: "intro-popup.html",
+    title: 'Benvenuto',
+    scope: $scope,
+    buttons: [
+      {
+        text: '<b>OK</b>',
+        type: 'button-positive'
+      }
+    ]
+  });
+        
+        
+        window.localStorage.setItem("firstboot","false");
+    }
+})
+
+.controller('MapDetailCtrl', function ($location, $scope, $stateParams, $http, routeConfig,MapService) {
+
+    
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function (position) {
+            //Do nothing
+        },function (error) {
+            navigator.notification.alert("Per migliorare l'esperienza d'uso si consiglia di attivare i servizi di geolocalizzazione.", function () {}, "Info", "Chiudi");
+        },{
+            timeout: 5000
+        });
+    }
+    
+    MapService.init($stateParams.mapId).then(function(result) {
+        var jsonInit = result[0];
+        var jsonData = result[1];
+        
+        window.sessionStorage.setItem("jsonInit",JSON.stringify(jsonInit));
+        window.sessionStorage.setItem("jsonData",JSON.stringify(jsonData));
+        
+        startMap(jsonInit.data[0],jsonData.data[0]);
+    },function(err){
+        var jsonInit = window.sessionStorage.getItem("jsonInit");
+        var jsonData = window.sessionStorage.getItem("jsonData");
+        
+        if(jsonInit===undefined || jsonData===undefined){
+            navigator.notification.alert("Errore di comunicazione con il server", function () {}, "Error", "Chiudi");
+        }else{
+            var jsonInitObj = JSON.parse(jsonInit);
+            var jsonDataObj = JSON.parse(jsonData);
+
+            startMap(jsonInitObj.data[0],jsonDataObj.data[0]);
+            
+            setTimeout(function(){mapWorkOffline();},5000);
+        }
+    });
+
+    $scope.scanQrcode = function(){
+        capturePhoto(function(qrmessage){
+            //{mId: "samueleferrari.mpao2mk0",rId : "34",cId: "1",lat:"46.933553",lng:"11.367781"}
+            // var test = "{\"mId\": \"samueleferrari.mpao2mk0\",\"rId\" : \"34\",\"cId\": \"1\",\"lat\":\"46.933553\",\"lng\":\"11.367781\"}";
+            // alert(qrmessage);
+            //    alert($location.path());
+            
+            var mapId = $location.path().substr($location.path().lastIndexOf("/"));
+        
+            try{
+                var obj = JSON.parse(qrmessage.replace(/\\"/g, '"'));
+                obj.mId = mapId;
+            }catch(err){
+                navigator.notification.alert("Errore durante la scansione, riprovare.", function () {}, "Error", "Chiudi");
+                return;
+            }
+            
+            MapService.getCheckpointData(obj).then(function(result){
+                addGeoJSONMarker(obj.lat,obj.lng,result);
+            },function(err){
+                addGeoJSONMarker(obj.lat,obj.lng,
+                                 {title:"Checkpoint "+obj.cId,
+                                  description:"Sentiero "+obj.rId,
+                                  directions:"",
+                                  directionsImg:""
+                                 });
+            });
+            
+            MapService.updateCheckpoint({"mapId":obj.mId, "routeId" : obj.rId, "checkpointId": obj.cId, $inc: { accessNumber: 1 } }).then(function(result) {
+
+            });
+
+        });
+    }
+
+    $scope.cacheMap = function(){
+
+        navigator.notification.confirm(
+            "Il download della mappa consumerà parte dei dati mobili disponibili.",
+            function(buttonIndex){
+                if(buttonIndex == 1){
+                    cachingBounds();
+                }else{
+                    return false;
+                }
+            },
+            "Info",
+            ["OK","Annulla"]
+        );
+    }
+
+});
