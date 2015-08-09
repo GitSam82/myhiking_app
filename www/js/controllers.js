@@ -9,7 +9,7 @@ angular.module('myhiking.controllers', [])
         navigator.notification.alert("Errore di comunicazione con il server", function () {}, "Error", "Chiudi");
     });
           
-    window.localStorage.removeItem("firstboot");
+    //window.localStorage.removeItem("firstboot");
     var firstBoot = window.localStorage.getItem("firstboot");
 
     if(firstBoot == undefined){

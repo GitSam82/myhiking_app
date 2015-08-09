@@ -5,6 +5,7 @@ angular.module('myhiking.services', [])
         getAll: function() {
           // $http returns a promise, which has a then function, which also returns a promise
             var url = routeConfig.URL+"map/all";
+            
             var promise = $http.get(url).then(function (response) {
                 return response.data;
             });

@@ -26,7 +26,8 @@ onDeviceOffline: function() {
 angular.module('myhiking', ['ionic', 'myhiking.services', 'myhiking.controllers'])
 
     .constant("routeConfig", {
-        "URL": "http://192.168.1.100:3001/",
+        //"URL": "http://192.168.1.100:3001/",
+        "URL": "http://myhiking-sam82app.rhcloud.com/",
         "PORT": ""
     })
     .config(function ($stateProvider, $urlRouterProvider) {
