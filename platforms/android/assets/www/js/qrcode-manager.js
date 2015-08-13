@@ -1,9 +1,9 @@
 
 function capturePhoto(callback) {
     qrcode.callback = callback;
-    //  vsr pictureSource=navigator.camera.PictureSourceType;
-   var destinationType=navigator.camera.DestinationType;
-   //  qrcode.callback = read;
+   
+    var destinationType = navigator.camera.DestinationType;
+   
     // Take picture using device camera and retrieve image as base64-encoded string
     navigator.camera.getPicture(onPhotoDataSuccess, onFail, {
         quality: 50,
@@ -11,7 +11,7 @@ function capturePhoto(callback) {
     });
 }
 
-function onFail(message){
+function onFail(message) {
      navigator.notification.alert("Errore durante la scansione:" + message + ". ", function () {}, "Error", "Chiudi");
 }
 

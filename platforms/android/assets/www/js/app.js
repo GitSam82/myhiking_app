@@ -1,27 +1,27 @@
-
 var app = {
-initialize: function() {
-    this.bindEvents();
-},
+    initialize: function () {
+        this.bindEvents();
+    },
     
-// Bind Event Listeners
-bindEvents: function() {
-    document.addEventListener('deviceready', this.onDeviceReady, false);
-},
-    
-// deviceready Event Handler
-onDeviceReady: function() {
-    document.addEventListener('online', app.onDeviceOnline, false);
-    document.addEventListener('offline', app.onDeviceOffline, false);
-},
+    // Bind Event Listeners
+    bindEvents: function () {
+        document.addEventListener('deviceready', this.onDeviceReady, false);
+    },
 
-onDeviceOnline: function() {
-    mapWorkOnline();
-},
+    // deviceready Event Handler
+    onDeviceReady: function () {
+        document.addEventListener('online', app.onDeviceOnline, false);
+        document.addEventListener('offline', app.onDeviceOffline, false);
+    },
 
-onDeviceOffline: function() {
-   mapWorkOffline();
-}};
+    onDeviceOnline: function () {
+        mapWorkOnline();
+    },
+
+    onDeviceOffline: function () {
+       mapWorkOffline();
+    }
+};
 
 angular.module('myhiking', ['ionic', 'myhiking.services', 'myhiking.controllers'])
 

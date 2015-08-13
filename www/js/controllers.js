@@ -78,6 +78,11 @@ angular.module('myhiking.controllers', [])
                 try {
                     var obj = JSON.parse(qrmessage.replace(/\\"/g, '"'));
                     obj.mId = mapId;
+                    
+                    if(isNaN(obj.rId) || isNaN(obj.cId) || isNaN(obj.lat) || isNaN(obj.lng)){
+                        navigator.notification.alert("Errore durante la scansione, riprovare.", function () {}, "Error", "Chiudi");
+                        return;
+                    }
                 } catch (err) {
                     navigator.notification.alert("Errore durante la scansione, riprovare.", function () {}, "Error", "Chiudi");
                     return;

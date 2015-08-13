@@ -52,14 +52,14 @@ function startMap(initObj, initGeoJSON) {
 
     MAP.setView([LAT, LNG], ZOOM);
     MAP.setMaxBounds(bounds);
-
+    
 }
 
 //Use a fixed position readed from qrcode, to adjust the coord readed by the geolocation API
 //It's for make a better 
 function addGeoJSONMarker(lat, lng, additionalData) {
     var finalLat, finalLng, userLat, userLng;
-
+    
     if (navigator.geolocation) {
         var fixedPosition = L.latLng(lat, lng),
             userPosition = undefined;
@@ -104,6 +104,7 @@ function addGeoJSONMarker(lat, lng, additionalData) {
 }
 
 function addMarker(lat, lng, additionalJSONData) {
+    
     var checkpoint = {
         "type": "Feature",
         "properties": {
@@ -145,6 +146,8 @@ function addMarker(lat, lng, additionalJSONData) {
         closeButton: true,
         minWidth: 280
     });
+    
+    navigator.notification.alert("Checkpoint aggiunto correttamente.", function () {}, "Info", "Chiudi");
 
 }
 
@@ -180,9 +183,7 @@ function updateStatus() {
             element.removeClass('bar-energized');
             element.addClass('bar-assertive');
         }
-
         document.getElementById('status_title').innerHTML = status_text + " " + cache_text;
-
 
     });
 
@@ -210,7 +211,7 @@ function caching(which, tile_list) {
     var zmin = MAP.getZoom(),
         zmax = CACHE_ZOOM_MAX;
 
-    var status_block = document.getElementById('status');
+    var status_block = document.getElementById('status_title');
     BASE.downloadXYZList(
         // 1st param: a list of XYZ objects indicating tiles to download
         tile_list,
