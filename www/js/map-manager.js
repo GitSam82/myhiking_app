@@ -10,24 +10,23 @@ function startMap(initObj, initGeoJSON) {
         maxZoom: initObj.maxZoom
     });
 
-    try {
-        CACHE_ZOOM_MAX = initObj.maxZoom;
-        ACCESS_TOKEN = initObj.accessToken;
-        MAP_ID = initObj.mapId;
-        FOLDER_NAME = initObj.folderName;
-        MAP_NAME = initObj.name;
-
-        LAT = initObj.center[0];
-        LNG = initObj.center[1];
-        ZOOM = initObj.minZoom;
-
-        var southWest = L.latLng(initObj.southWestBound[0], initObj.southWestBound[1]);
-        northEast = L.latLng(initObj.northEastBound[0], initObj.northEastBound[1])
+    var ACCESS_TOKEN = initObj.accessToken,
+        MAP_ID = initObj.mapId,
+        FOLDER_NAME = initObj.folderName,
+        MAP_NAME = initObj.name,
+        LAT = initObj.center[0],
+        LNG = initObj.center[1],
+        ZOOM = initObj.minZoom,
+        southWest = L.latLng(initObj.southWestBound[0], initObj.southWestBound[1]),
+        northEast = L.latLng(initObj.northEastBound[0], initObj.northEastBound[1]),
         bounds = L.latLngBounds(southWest, northEast);
+            
+    CACHE_ZOOM_MAX = initObj.maxZoom;
+    MAX_BOUNDS = bounds;
+    MAP.fitBounds(bounds);
 
-        MAX_BOUNDS = bounds;
-        MAP.fitBounds(bounds);
-
+    try {
+        
         L.mapbox.accessToken = ACCESS_TOKEN;
 
         BASE = L.mapbox.tileLayerCordova('https://api.tiles.mapbox.com/v4/' + MAP_ID + '/{z}/{x}/{y}.png?access_token=' + ACCESS_TOKEN, {
@@ -48,7 +47,7 @@ function startMap(initObj, initGeoJSON) {
 
         L.control.locate().addTo(MAP);
     } catch (e) {
-        alert(e);
+        navigator.notification.alert("Errore durante il caricamento della mappa", function () {}, "Info", "Chiudi");
     }
 
     MAP.setView([LAT, LNG], ZOOM);
@@ -62,11 +61,10 @@ function addGeoJSONMarker(lat, lng, additionalData) {
     var finalLat, finalLng, userLat, userLng;
 
     if (navigator.geolocation) {
-        var fixedPosition = L.latLng(lat, lng);
+        var fixedPosition = L.latLng(lat, lng),
+            userPosition = undefined;
 
-        var userPosition = undefined;
-
-        navigator.geolocation.getCurrentPosition(function (position) {
+        navigator.geolocation.getCurrentPosition (function (position) {
             userLat = position.coords.latitude;
             userLng = position.coords.longitude;
             userPosition = L.latLng(userLat, userLng);
@@ -141,7 +139,7 @@ function addMarker(lat, lng, additionalJSONData) {
         '<h3>Direzione</h3>' +
         featureLayer.getGeoJSON().properties.directions +
         '<img src="' + featureLayer.getGeoJSON().properties.directionsImg + '" class="popup_img"/>' +
-        '</div>'
+        '</div>' +
     '</div>';
     featureLayer.bindPopup(content, {
         closeButton: true,
@@ -199,18 +197,18 @@ function cachingBounds() {
     var message = "Inizio la procedura di caching dei tiles.\n" + "Zoom level " + zmin + " through " + zmax + "\n" + tile_list.length + " tiles totali.";
     var ok = navigator.notification.confirm(message,
                                             function (buttonIndex) {
-        if (buttonIndex == 1) {
-            caching('bounds', tile_list);
-        } else {
-            return false;
-        }
-    },
-                                            "Info", ["OK", "Annulla"]);
+                if (buttonIndex == 1) {
+                    caching('bounds', tile_list);
+                } else {
+                    return false;
+                }
+            },
+            "Info", ["OK", "Annulla"]);
 }
 
 function caching(which, tile_list) {
-    var zmin = MAP.getZoom();
-    var zmax = CACHE_ZOOM_MAX;
+    var zmin = MAP.getZoom(),
+        zmax = CACHE_ZOOM_MAX;
 
     var status_block = document.getElementById('status');
     BASE.downloadXYZList(
@@ -234,7 +232,7 @@ function caching(which, tile_list) {
         // 5th param: error callback
         // parameter is the error message string
         function (error) {
-            navigator.notification.alert("Errore durante il savataggio:"+error.code, function () {}, "Info", "Chiudi");
+            navigator.notification.alert("Errore durante il savataggio:" + error.code, function () {}, "Info", "Chiudi");
         }
     );
 }
